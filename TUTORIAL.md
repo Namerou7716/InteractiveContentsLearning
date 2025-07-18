@@ -46,14 +46,14 @@ TypeScriptの設定ファイルを作成します。プロジェクトのルー�
 ```json
 {
   "compilerOptions": {
-    // コンパイル対象: 最新のES機能を使用
-    "target": "ESNext",
+    // コンパイル対象: ES2017（async/awaitが使用可能、広いブラウザ対応）
+    "target": "ES2017",
     // クラスフィールドの定義方法を最新の仕様に合わせる
     "useDefineForClassFields": true,
     // モジュールシステム: ES Modules（import/export）を使用
     "module": "ESNext",
-    // 使用可能なライブラリ: 最新ES機能とブラウザDOM API
-    "lib": ["ESNext", "DOM"],
+    // 使用可能なライブラリ: ES2017機能とブラウザDOM API
+    "lib": ["ES2017", "DOM"],
     // モジュール解決方式: Node.js方式（node_modulesから探索）
     "moduleResolution": "Node",
     // 厳密な型チェックを有効化（推奨）
@@ -78,6 +78,15 @@ TypeScriptの設定ファイルを作成します。プロジェクトのルー�
 }
 ```
 
+#### なぜES2017を選択したか
+
+このプロジェクトでは以下の理由でES2017を選択しています：
+
+- **実際の使用機能**: ES2015のimport/export、const、アロー関数が中心
+- **ブラウザ互換性**: ES2017なら大部分のモダンブラウザで動作
+- **将来の拡張性**: async/awaitが使用可能（API通信等で有用）
+- **学習効果**: 初学者には過度に新しい機能より、確立された機能が適切
+
 ### `vite.config.ts`の作成
 
 Viteの設定ファイルを作成します。プロジェクトのルートに `vite.config.ts` を以下の内容で作成してください。
@@ -98,14 +107,19 @@ export default defineConfig({
 
 ### `package.json`の`scripts`の更新
 
-`package.json`の`scripts`セクションを以下のように更新し、Viteコマンドを使えるようにします。
+`package.json`の`scripts`セクションを以下のように更新し、Viteコマンドを使えるようにします。また、ES Modulesを使用するため`type`を`module`に設定します。
 
 ```json
+{
   "scripts": {
     "dev": "vite",
     "build": "vite build"
   },
+  "type": "module"
+}
 ```
+
+**重要**: `"type": "module"`の設定により、プロジェクト全体でES Modulesが使用できるようになります。
 
 ## Step 2. Three.jsの基本設定
 

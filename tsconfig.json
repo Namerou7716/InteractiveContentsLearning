@@ -1,10 +1,10 @@
 
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2017",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ES2017", "DOM"],
     "moduleResolution": "Node",
     "strict": true,
     "sourceMap": true,
