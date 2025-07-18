@@ -1,21 +1,206 @@
-
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Three.js Collision Demo</title>
-    <style>
-      body {
-        margin: 0;
-        overflow: hidden;
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three.js + akashic-extension/collision-js Demo</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Courier New', monospace;
+    }
+    canvas {
+      display: block;
+      cursor: crosshair;
+    }
+    
+    /* プリローダー */
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #00ff00;
+      font-size: 18px;
+      z-index: 1000;
+    }
+    
+    #loader.hidden {
+      display: none;
+    }
+    
+    /* 起動時のアニメーション */
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+    
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
       }
-      canvas {
-        display: block;
+    }
+    
+    /* エラーメッセージ */
+    .error-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 0, 0, 0.9);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      z-index: 1001;
+      display: none;
+    }
+    
+    /* レスポンシブデザイン */
+    @media (max-width: 768px) {
+      #ui {
+        font-size: 10px !important;
+        padding: 10px !important;
       }
-    </style>
-  </head>
-  <body>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+      
+      #debug-info {
+        font-size: 9px !important;
+        padding: 8px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- プリローダー -->
+  <div id="loader">
+    <div>
+      <div>Loading Three.js + akashic-extension/collision-js...</div>
+      <div style="text-align: center; margin-top: 20px;">
+        <div style="width: 200px; height: 4px; background: #333; border-radius: 2px; overflow: hidden;">
+          <div id="progress-bar" style="width: 0%; height: 100%; background: #00ff00; transition: width 0.3s;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- エラーメッセージ -->
+  <div id="error-message" class="error-message">
+    <h3>エラーが発生しました</h3>
+    <p id="error-text"></p>
+    <button onclick="location.reload()">リロード</button>
+  </div>
+
+  <!-- メインスクリプト -->
+  <script type="module">
+    let progressValue = 0;
+    const progressBar = document.getElementById('progress-bar');
+    const loader = document.getElementById('loader');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+
+    // プログレスバーの更新
+    function updateProgress(value) {
+      progressValue = Math.min(100, Math.max(0, value));
+      progressBar.style.width = progressValue + '%';
+    }
+
+    // エラーハンドリング
+    function showError(message) {
+      console.error('Application Error:', message);
+      loader.classList.add('hidden');
+      errorText.textContent = message;
+      errorMessage.style.display = 'block';
+    }
+
+    // ローディング進行状況の模擬
+    function simulateLoading() {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 30;
+        updateProgress(progress);
+        
+        if (progress >= 100) {
+          clearInterval(interval);
+          updateProgress(100);
+          
+          // 短い遅延後にアプリケーションを開始
+          setTimeout(() => {
+            loader.classList.add('hidden');
+            loadApplication();
+          }, 500);
+        }
+      }, 100);
+    }
+
+    // アプリケーションの読み込み
+    async function loadApplication() {
+      try {
+        // メインアプリケーションの読み込み
+        await import('/src/main.ts');
+        
+        // フェードインアニメーション
+        document.body.classList.add('fade-in');
+        
+        console.log('Application loaded successfully');
+      } catch (error) {
+        showError('アプリケーションの読み込みに失敗しました: ' + error.message);
+      }
+    }
+
+    // WebGLサポートのチェック
+    function checkWebGLSupport() {
+      try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        return !!gl;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // 初期化
+    function init() {
+      // WebGLサポートのチェック
+      if (!checkWebGLSupport()) {
+        showError('このブラウザはWebGLをサポートしていません。');
+        return;
+      }
+
+      // モジュールサポートのチェック
+      if (!window.navigator.userAgent.includes('Chrome') && 
+          !window.navigator.userAgent.includes('Firefox') && 
+          !window.navigator.userAgent.includes('Safari')) {
+        console.warn('このブラウザでの動作は保証されません。');
+      }
+
+      // ローディング開始
+      simulateLoading();
+    }
+
+    // DOMContentLoadedイベントで初期化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    // 未処理のエラーをキャッチ
+    window.addEventListener('error', (event) => {
+      showError('予期しないエラーが発生しました: ' + event.error.message);
+    });
+
+    // 未処理のPromise拒否をキャッチ
+    window.addEventListener('unhandledrejection', (event) => {
+      showError('非同期エラーが発生しました: ' + event.reason);
+    });
+  </script>
+</body>
 </html>
