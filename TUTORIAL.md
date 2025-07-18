@@ -46,20 +46,34 @@ TypeScriptの設定ファイルを作成します。プロジェクトのルー�
 ```json
 {
   "compilerOptions": {
+    // コンパイル対象: 最新のES機能を使用
     "target": "ESNext",
+    // クラスフィールドの定義方法を最新の仕様に合わせる
     "useDefineForClassFields": true,
+    // モジュールシステム: ES Modules（import/export）を使用
     "module": "ESNext",
+    // 使用可能なライブラリ: 最新ES機能とブラウザDOM API
     "lib": ["ESNext", "DOM"],
+    // モジュール解決方式: Node.js方式（node_modulesから探索）
     "moduleResolution": "Node",
+    // 厳密な型チェックを有効化（推奨）
     "strict": true,
+    // デバッグ用のソースマップを生成
     "sourceMap": true,
+    // JSONファイルのインポートを許可
     "resolveJsonModule": true,
+    // CommonJSとESモジュールの相互運用を有効化
     "esModuleInterop": true,
+    // JavaScriptファイルを出力しない（Viteが処理するため）
     "noEmit": true,
+    // 使用されていないローカル変数をエラーとして検出
     "noUnusedLocals": true,
+    // 使用されていないパラメータをエラーとして検出
     "noUnusedParameters": true,
+    // 関数の一部のパスで戻り値がない場合をエラーとして検出
     "noImplicitReturns": true
   },
+  // TypeScriptでコンパイルする対象ディレクトリ
   "include": ["src"]
 }
 ```
